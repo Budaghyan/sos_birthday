@@ -1,36 +1,34 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="hy">
 <head>
   <meta charset="UTF-8">
   <title>Սոսի տարեդարձ 🎂</title>
   <style>
     html, body {
-        margin: 0;
-        font-family: "Comic Sans MS", cursive, sans-serif;
-        background: url("images/background.jpg") no-repeat center center fixed;
-        background-size: cover;
-        text-align: center;
-        color: #333;
-        height: 100%;
+      margin: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: url("images/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      text-align: center;
+      color: #333;
+      height: 100%;
     }
 
     .card {
-      position: fixed; /* Makes the card fixed in the viewport */
-      top: 50%; /* Moves the top edge of the card to the vertical center */
-      left: 50%; /* Moves the left edge of the card to the horizontal center */
+      position: fixed;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(102, 102, 102, 0.3); /* полупрозрачная карточка */
+      background: rgba(102, 102, 102, 0.3);
       border-radius: 20px;
-      margin: 40px auto;
       padding: 30px;
-      z-index: 1000;
-      height: 800px;
       width: 800px;
+      height: auto;
       box-shadow: 0 0 25px rgba(0,0,0,0.3);
     }
 
     h1 { color: #dbdbdb; font-size: 1.8em; }
-    h3 { color: #fffff0; font-size: 1.3em;}
+    h3 { color: #fffff0; font-size: 1.3em; }
 
     input {
       width: 90%;
@@ -39,7 +37,7 @@
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 16px;
-      background: rgba(255, 255, 255, 0.5); /* прозрачные поля */
+      background: rgba(255, 255, 255, 0.5);
     }
 
     select {
@@ -49,8 +47,8 @@
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 16px;
-      background: rgba(255, 255, 255, 0.5); /* прозрачные поля */
-    }
+      background: rgba(255, 255, 255, 0.5);
+   }
 
     button {
       width: 70%;
@@ -66,15 +64,12 @@
       transition: 0.3s;
     }
 
-    ::placeholder {
-      color: #000000;
-    }
-
     button:hover { background: rgba(124, 124, 124, 0.9); }
+
+    ::placeholder { color: #000; }
   </style>
 </head>
 <body>
-
   <div class="card">
     <h1>🎉 Մենք 5 տարեկան ենք! 🎉</h1>
     <p style="color: #fffff0; font-size: 1.2em;">Սիրով հրավիրում ենք ձեզ` <br><strong>Սոսի 5-ամյակին</strong> նվիրված տոնակատարությանը։ 🥳</p>
@@ -101,14 +96,14 @@
   <script>
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
       e.preventDefault();
-    
+
       const formData = new URLSearchParams();
       formData.append("name", document.getElementById("name").value);
       formData.append("phone", document.getElementById("phone").value);
       formData.append("status", document.getElementById("status").value);
       formData.append("count", document.getElementById("count").value);
-    
-      fetch("https://script.google.com/macros/s/AKfycbxSBcy8WP6SEHgN2jnvwsex3P5aM_tfh6D2D36Pd7F5K9yIpAcfDevMoQ5zkbCv37FJIQ/exec", {
+
+      fetch("https://script.google.com/macros/s/AKfycbypcFO5s9utPMrQrqD2eNMKvjqF9qOUNdMN7UWfvc1EGuMquNbcqt77qnaLE4kVvFmmpw/exec", {
         method: "POST",
         body: formData
       })
@@ -119,11 +114,9 @@
       })
       .catch(err => {
         document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
+        console.error(err);
       });
     });
   </script>
 </body>
 </html>
-
-
-

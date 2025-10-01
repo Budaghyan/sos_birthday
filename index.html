@@ -97,26 +97,25 @@
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
       e.preventDefault();
 
-      const formData = new URLSearchParams();
-      formData.append("name", document.getElementById("name").value);
-      formData.append("phone", document.getElementById("phone").value);
-      formData.append("status", document.getElementById("status").value);
-      formData.append("count", document.getElementById("count").value);
-
-      fetch("https://script.google.com/macros/s/AKfycbypcFO5s9utPMrQrqD2eNMKvjqF9qOUNdMN7UWfvc1EGuMquNbcqt77qnaLE4kVvFmmpw/exec", {
-        method: "POST",
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("response").innerText = "✅ Պատասխանը պահպանված է!";
-        document.getElementById("rsvpForm").reset();
-      })
-      .catch(err => {
-        document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
-        console.error(err);
+      const params = new URLSearchParams({
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        status: document.getElementById("status").value,
+        count: document.getElementById("count").value
       });
+
+      fetch("https://script.google.com/macros/s/AKfycbxPYwkEBX-WyMq22yTxPmkaXqgPW33BiBuTUMBM0t0Bo_Dgg5IgaoSEHljJe0cOwyda2w/exec?" + params.toString())
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("response").innerText = "✅ Պատասխանը պահպանված է!";
+          document.getElementById("rsvpForm").reset();
+        })
+        .catch(err => {
+          document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
+          console.error(err);
+        });
     });
   </script>
 </body>
 </html>
+

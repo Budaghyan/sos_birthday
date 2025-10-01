@@ -104,7 +104,7 @@
         count: document.getElementById("count").value
       });
 
-      fetch("https://script.google.com/macros/s/AKfycbxPYwkEBX-WyMq22yTxPmkaXqgPW33BiBuTUMBM0t0Bo_Dgg5IgaoSEHljJe0cOwyda2w/exec?" + params.toString())
+      fetch("https://script.google.com/macros/s/AKfycbx4LYJXvvJgNdQt_nJmfdPcsoBVok1metIHh3Qal-MpRXq4k6y5fleO8MAF7aZ3O-SErw/exec?" + params.toString())
         .then(res => res.text())
         .then(data => {
           document.getElementById("response").innerText = "✅ Պատասխանը պահպանված է!";
@@ -118,4 +118,5 @@
   </script>
 </body>
 </html>
+
 

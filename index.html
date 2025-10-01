@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Սոսի տարեդարձ 🎂</title>
+  <style>
+    html, body {
+        margin: 0;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background: url("images/background.jpg") no-repeat center center fixed;
+        background-size: cover;
+        text-align: center;
+        color: #333;
+        height: 100%;
+    }
+
+    .card {
+      background: rgba(102, 102, 102, 0.3); /* полупрозрачная карточка */
+      border-radius: 20px;
+      margin: 40px auto;
+      padding: 30px;
+      max-width: 500px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    }
+
+    h1 { color: #dbdbdb; font-size: 1.6em; }
+    h3 { color: #fffff0; font-size: 1.2em;}
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.5); /* прозрачные поля */
+    }
+
+    select {
+      width: 94%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.5); /* прозрачные поля */
+    }
+
+    button {
+      width: 70%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      font-size: 16px;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover { background: rgba(124, 124, 124, 0.9); }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🎉 Մենք 5 տարեկան ենք! 🎉</h1>
+    <p style="color: #fffff0; font-size: 1.1em;">Սիրով հրավիրում ենք ձեզ` <br><strong>Սոսի 5-ամյակին</strong> նվիրված տոնակատարությանը։ 🥳</p>
+    <p style="color: #fffff0; font-size: 1.1em;">Տոնակատարությունը տեղի կունենա՝ <br><span style="text-align: center;"><b>Նոյեմբերի 27-ին <br>Կիլիկիո գարդեն ռեստորանային համալիրում <br>Ժամը 18:00</span></b></p>
+
+    <p><a href="https://yandex.com/maps/-/CLBII2kZ" style="color: #fffff0; font-size: 1.1em;">Ինչպե՞ս հասնել</a></p>
+
+    <h3 style="font-style: normal;">Հաստատեք ձեր մասնակցությունը:</h3>
+    <form id="rsvpForm">
+      <input type="text" id="name" placeholder="Ձեր անունը" required><br>
+      <input type="tel" id="phone" placeholder="Հեռախոսահամար" required><br>
+      <input type="number" id="count" placeholder="Անձանց քանակ" required><br>
+      <select id="status">
+        <option value="Այո">Այո 🎉</option>
+        <option value="Ոչ">Ոչ 😢</option>
+        <option value="Հնարավոր է">Հնարավոր է 🙂</option>
+      </select><br>
+      <button type="submit">Ուղարկել</button>
+    </form>
+
+    <p id="response"></p>
+  </div>
+
+  <script>
+    document.getElementById("rsvpForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      fetch("https://script.google.com/macros/s/AKfycbxdsWkem7l1Te0Vs_EOe79An1Xg6p8qIPhcFcuEEsBpunk8ybgw9_f1r0EtHyHOX8fVyw/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          status: document.getElementById("status").value,
+          count: document.getElementById("count").value
+        }),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("response").innerText = "✅ Պատասխանը պահպանված է!";
+        document.getElementById("rsvpForm").reset();
+      })
+      .catch(err => {
+        document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
+      });
+    });
+  </script>
+</body>
+</html>

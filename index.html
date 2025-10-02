@@ -82,6 +82,7 @@
       <input type="text" id="name" placeholder="Ձեր անունը" required><br>
       <input type="tel" id="phone" placeholder="Հեռախոսահամար" required><br>
       <input type="number" id="count" placeholder="Անձանց քանակ" required><br>
+      <input type="text" id="date" name="date" hidden readonly>
       <select id="status">
         <option value="Այո">Այո 🎉</option>
         <option value="Ոչ">Ոչ 😢</option>
@@ -97,10 +98,22 @@
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
     e.preventDefault();
 
+    const now = new Date();
+    const formattedDate = 
+    String(now.getDate()).padStart(2, "0") + "." +
+    String(now.getMonth() + 1).padStart(2, "0") + "." +
+    now.getFullYear() + " " +
+    String(now.getHours()).padStart(2, "0") + ":" +
+    String(now.getMinutes()).padStart(2, "0") + ":" +
+    String(now.getSeconds()).padStart(2, "0");
+
+  document.getElementById("date").value = formattedDate;
+
     fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
       method: "POST",
       body: JSON.stringify({
         data: [{
+          date: document.getElementById("date").value,
           name: document.getElementById("name").value,
           phone: document.getElementById("phone").value,
           count: document.getElementById("count").value,
@@ -121,6 +134,7 @@
   </script>
 </body>
 </html>
+
 
 
 

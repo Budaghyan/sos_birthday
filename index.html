@@ -152,7 +152,7 @@
 
     <h3 style="font-style: normal;">Հաստատեք ձեր մասնակցությունը:</h3>
     <form id="rsvpForm">
-      <input type="text" id="name" placeholder="Ձեր անունը" required><br>
+      <input type="text" id="name" placeholder="Անուն ազգանուն" required><br>
       <input type="tel" id="phone" placeholder="Հեռախոսահամար" inputmode="tel" required><br>
       <input type="number" id="count" placeholder="Անձանց քանակ" inputmode="numeric" min="1" required><br>
       <select id="status">
@@ -186,11 +186,11 @@
     })
     .then(res => res.json())
     .then(data => {
-      showPopup(`✅ Հարգելի ${name}, դուք հաջողությամբ գրանցվեցիք!`);
+      showPopup(`🎉 Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք! 🎉`);
       document.getElementById("rsvpForm").reset();
     })
     .catch(err => {
-      showPopup(`❌ Հարգելի ${name}, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին.`);
+      showPopup(`❗ Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին. ❗`);
     });
   });
   
@@ -218,4 +218,5 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 

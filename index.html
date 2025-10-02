@@ -155,7 +155,8 @@
       <input type="text" id="name" placeholder="Անուն ազգանուն" required><br>
       <input type="tel" id="phone" placeholder="Հեռախոսահամար" inputmode="tel" required><br>
       <input type="number" id="count" placeholder="Անձանց քանակ" inputmode="numeric" min="1" required><br>
-      <select id="status">
+      <select id="status" required>
+        <option value="" disabled selected hidden>Ընտրել</option>
         <option value="Այո">Այո 🎉</option>
         <option value="Ոչ">Ոչ 😢</option>
         <option value="Հնարավոր է">Հնարավոր է 🙂</option>
@@ -196,7 +197,7 @@
   
   function showPopup(message) {
   const popup = document.getElementById("popup");
-  document.getElementById("popup-message").innerText = message;
+  document.getElementById("popup-message").innerHTML = message;
 
   popup.style.display = "flex";
   popup.classList.remove("fade-out");
@@ -206,7 +207,7 @@
     setTimeout(() => {
       popup.style.display = "none";
     }, 500);
-  }, 4000);
+  }, 4500);
 }
 
 function closePopup() {
@@ -218,5 +219,6 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 
 

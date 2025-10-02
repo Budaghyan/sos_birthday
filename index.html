@@ -95,29 +95,33 @@
 
   <script>
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
-      e.preventDefault();
+    e.preventDefault();
 
-      const params = new URLSearchParams({
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        status: document.getElementById("status").value,
-        count: document.getElementById("count").value
-      });
-
-      fetch("https://script.google.com/macros/s/AKfycbxxbLaz3412hZfWGwhGhIhA38VFW07fCHRJ6oRk4X_aoSqxf3NHhDYZSZugds4nxO6Jyw/exec?" + params.toString())
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("response").innerText = "✅ Պատասխանը պահպանված է!";
-          document.getElementById("rsvpForm").reset();
-        })
-        .catch(err => {
-          document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
-          console.error(err);
-        });
+    fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
+      method: "POST",
+      body: JSON.stringify({
+        data: [{
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          count: document.getElementById("count").value,
+          status: document.getElementById("status").value
+        }]
+      }),
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("response").innerText = "✅ Դուք հաջողությամբ գրանցվեցիք!";
+      document.getElementById("rsvpForm").reset();
+    })
+    .catch(err => {
+      document.getElementById("response").innerText = "❌ Խնդիր, փորձեք կրկին.";
     });
+  });
   </script>
 </body>
 </html>
+
 
 
 

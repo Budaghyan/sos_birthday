@@ -2,6 +2,7 @@
 <html lang="hy">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Սոսի տարեդարձ 🎂</title>
 
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
@@ -31,7 +32,7 @@
       background: rgba(102, 102, 102, 0.3);
       border-radius: 20px;
       padding: 30px;
-      width: 800px;
+      max-width: 800px;
       height: auto;
       box-shadow: 0 0 25px rgba(0,0,0,0.3);
     }
@@ -89,8 +90,8 @@
     <h3 style="font-style: normal;">Հաստատեք ձեր մասնակցությունը:</h3>
     <form id="rsvpForm">
       <input type="text" id="name" placeholder="Ձեր անունը" required><br>
-      <input type="tel" id="phone" placeholder="Հեռախոսահամար" required><br>
-      <input type="number" id="count" placeholder="Անձանց քանակ" required><br>
+      <input type="tel" id="phone" placeholder="Հեռախոսահամար" inputmode="tel" required><br>
+      <input type="number" id="count" placeholder="Անձանց քանակ" inputmode="numeric" min="1" required><br>
       <select id="status">
         <option value="Այո">Այո 🎉</option>
         <option value="Ոչ">Ոչ 😢</option>
@@ -110,7 +111,6 @@
       method: "POST",
       body: JSON.stringify({
         data: [{
-          time: document.getElementById("time").value,
           name: document.getElementById("name").value,
           phone: document.getElementById("phone").value,
           count: document.getElementById("count").value,
@@ -131,6 +131,7 @@
   </script>
 </body>
 </html>
+
 
 
 

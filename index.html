@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Սոսի տարեդարձ 🎂</title>
+  <title>🎂 Սոսի տարեդարձ 🎂</title>
 
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -37,7 +37,7 @@
       box-sizing: border-box;
     }
 
-    h1 { color: #dbdbdb; font-size: 1.7em; }
+    h1 { color: #dbdbdb; font-size: 1.8em; }
     h3 { color: #fffff0; font-size: 1.3em; }
 
     input {
@@ -134,6 +134,12 @@
       to   { opacity: 0; }
     }
 
+    #countdown {
+      font-size: 1.3em;
+      color: #fff;
+      margin: 20px 0;
+    }
+
   </style>
 </head>
 <body>
@@ -147,14 +153,15 @@
     <h1>Մենք շուտով 5 տարեկան ենք</h1>
     <p style="color: #fffff0; font-size: 1.2em;">Սիրով հրավիրում ենք ձեզ` <br>մասնակցելու <b>Սոսի</b> ծննդյան և մատաղի արարողությանը և մեզ հետ կիսելու այդ կարևոր ու հիշարժան օրը</p>
     <p style="color: #fffff0; font-size: 1.2em;">Սիրով կսպասենք ձեզ՝ <br><span style="text-align: center;"><b>📅 27 Նոյեմբերի 2025<br>📍 Կիլիկիո գարդեն <br>🕕 Ժամը 18:00</span></b></p>
+    <p id="countdown"></p>
     <p><a href="https://yandex.com/maps/-/CLBII2kZ" style="color: #fffff0; font-size: 1.2em;"><b>Ինչպե՞ս հասնել</b></a></p>
     <h3 style="font-style: normal;">Խնդրում ենք հաստատել ձեր մասնակցությունը ստորև</h3>
     <form id="rsvpForm">
-      <input type="text" id="name" placeholder="Անուն ազգանուն" required><br>
-      <input type="tel" id="phone" placeholder="Հեռախոսահամար" inputmode="tel" required><br>
-      <input type="number" id="count" placeholder="Անձանց քանակ" inputmode="numeric" min="1" required><br>
+      <input type="text" id="name" placeholder="Անուն ազգանուն *" required><br>
+      <input type="tel" id="phone" placeholder="Հեռախոսահամար *" inputmode="tel" required><br>
+      <input type="number" id="count" placeholder="Անձանց քանակ *" inputmode="numeric" min="1" required><br>
       <select id="status" required>
-        <option value="" disabled selected hidden>Ընտրել</option>
+        <option value="" disabled selected hidden>Ընտրել *</option>
         <option value="Այո">Մեծ սիրով</option>
         <option value="Ոչ">Ցավոք ոչ</option>
       </select><br>
@@ -165,10 +172,47 @@
   </div>
 
   <script>
+
+    function startCountdown() {
+      const targetDate = new Date("2025-11-27T18:00:00");
+      const countdownEl = document.getElementById("countdown");
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+          countdownEl.innerHTML = "🎉 Տոնակատարությունը սկսվել է 🎉";
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        countdownEl.innerHTML = `Մնացել է՝ ${days} օր ${hours} ժամ ${minutes} րոպե ${seconds} վայրկյան`;
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    startCountdown();
+    
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
     e.preventDefault();
 
     const name = document.getElementById("name").value;
+    const name_ch = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const count = document.getElementById("count").value.trim();
+    const status = document.getElementById("status").value;
+
+    if (!name_ch || !phone || !count || !status) {
+        showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
+        return;
+      }
 
     fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
       method: "POST",
@@ -216,4 +260,5 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 

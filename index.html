@@ -37,7 +37,7 @@
       box-sizing: border-box;
     }
 
-    h1 { color: #dbdbdb; font-size: 1.8em; }
+    h1 { color: #dbdbdb; font-size: 1.7em; }
     h3 { color: #fffff0; font-size: 1.3em; }
 
     input {
@@ -144,24 +144,21 @@
   </div>
   </div>
   <div class="card">
-    <h1>🎉 Մենք 5 տարեկան ենք! 🎉</h1>
-    <p style="color: #fffff0; font-size: 1.2em;">Սիրով հրավիրում ենք ձեզ` <br><strong>Սոսի 5-ամյակին</strong> նվիրված տոնակատարությանը։ 🥳</p>
-    <p style="color: #fffff0; font-size: 1.2em;">Տոնակատարությունը տեղի կունենա՝ <br><span style="text-align: center;"><b>Նոյեմբերի 27-ին, Կիլիկիո գարդեն ռեստորանային համալիրում <br>Ժամը 18:00</span></b></p>
-
-    <p><a href="https://yandex.com/maps/-/CLBII2kZ" style="color: #fffff0; font-size: 1.2em;">Ինչպե՞ս հասնել</a></p>
-
-    <h3 style="font-style: normal;">Հաստատեք ձեր մասնակցությունը:</h3>
+    <h1>Մենք շուտով 5 տարեկան ենք</h1>
+    <p style="color: #fffff0; font-size: 1.2em;">Սիրով հրավիրում ենք ձեզ` <br>մասնակցելու <b>Սոսի</b> ծննդյան և մատաղի արարողությանը և մեզ հետ կիսելու այդ կարևոր ու հիշարժան օրը</p>
+    <p style="color: #fffff0; font-size: 1.2em;">Սիրով կսպասենք ձեզ՝ <br><span style="text-align: center;"><b>📅 27 Նոյեմբերի 2025<br>📍 Կիլիկիո գարդեն ռեստորանային համալիր <br>🕕 Ժամը 18:00</span></b></p>
+    <p><a href="https://yandex.com/maps/-/CLBII2kZ" style="color: #fffff0; font-size: 1.2em;"><b>Ինչպե՞ս հասնել</b></a></p>
+    <h3 style="font-style: normal;">Խնդրում ենք հաստատել ձեր մասնակցությունը ստորև</h3>
     <form id="rsvpForm">
       <input type="text" id="name" placeholder="Անուն ազգանուն" required><br>
       <input type="tel" id="phone" placeholder="Հեռախոսահամար" inputmode="tel" required><br>
       <input type="number" id="count" placeholder="Անձանց քանակ" inputmode="numeric" min="1" required><br>
       <select id="status" required>
         <option value="" disabled selected hidden>Ընտրել</option>
-        <option value="Այո">Այո 🎉</option>
-        <option value="Ոչ">Ոչ 😢</option>
-        <option value="Հնարավոր է">Հնարավոր է 🙂</option>
+        <option value="Այո">Մեծ սիրով</option>
+        <option value="Ոչ">Ցավոք ոչ</option>
       </select><br>
-      <button type="submit">Ուղարկել</button>
+      <button type="submit">Հաստատել</button>
     </form>
 
     <p id="response"></p>
@@ -187,11 +184,11 @@
     })
     .then(res => res.json())
     .then(data => {
-      showPopup(`🎉 Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք! 🎉`);
+      showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
       document.getElementById("rsvpForm").reset();
     })
     .catch(err => {
-      showPopup(`❗ Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին. ❗`);
+      showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
     });
   });
   
@@ -219,6 +216,3 @@ function closePopup() {
   </script>
 </body>
 </html>
-
-
-

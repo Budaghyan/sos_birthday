@@ -191,7 +191,7 @@
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
 
-        countdownEl.innerHTML = `Մնացել է՝ ${days} օր ${hours} ժամ ${minutes} րոպե ${seconds} վայրկյան`;
+        countdownEl.innerHTML = `Մնացել է՝ <b>${days}</b> օր <b>${hours}</b> ժամ <b>${minutes}</b> րոպե <b>${seconds}</b> վայրկյան`;
       }
 
       updateCountdown();
@@ -211,7 +211,6 @@
 
     if (!name_ch || !phone || !count || !status) {
         showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
-        return;
       }
 
     fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
@@ -260,5 +259,6 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 
 

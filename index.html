@@ -26,7 +26,6 @@
       overflow-x: hidden;
     }
 
-    /* ✨ (8) Քարտիկի անիմացիա՝ էջի բեռնման ժամանակ */
     .card {
       margin: 30px auto;
       background: rgba(102, 102, 102, 0.3);
@@ -36,7 +35,7 @@
       max-width: 500px;
       box-shadow: 0 0 25px rgba(0,0,0,0.3);
       box-sizing: border-box;
-      animation: slideUp 1s ease-out; /* Ավելացված է */
+      animation: slideUp 1s ease-out;
     }
 
     @keyframes slideUp {
@@ -151,44 +150,32 @@
       margin: 20px 0;
     }
 
-    /* 🎈 (1) Կոնֆետտի canvas ամբողջ էկրանով */
-    #confetti {
+    /* 🎵 (3) Кнопка музыки (теперь скрытая) */
+    #music-btn {
+      display: none; /* кнопка теперь скрыта */
+    }
+
+    /* 💥 Конфетти-слой */
+    #confetti-canvas {
       position: fixed;
-      top: 0; left: 0;
+      bottom: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 1;
+      z-index: 2000;
     }
-
-    /* 🎵 (3) Երաժշտության կոճակի ձևավորում */
-    #music-btn {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.7);
-      border: none;
-      border-radius: 50%;
-      padding: 15px;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 10;
-      transition: 0.3s;
-    }
-
-    #music-btn:hover { background: rgba(255,255,255,0.9); }
-
   </style>
 </head>
 <body>
-  <!-- 🎈 (1) Կոնֆետտի ֆոն -->
-  <canvas id="confetti"></canvas>
-
-  <!-- 🎵 (3) Երաժշտություն և կոճակ -->
+  <!-- 🎵 (3) Музыка -->
   <audio id="bg-music" loop>
     <source src="music/happy_birthday.mp3" type="audio/mpeg">
   </audio>
   <button id="music-btn">🔊 Պարե՞նք</button>
+
+  <!-- 💥 Canvas для конфетти -->
+  <canvas id="confetti-canvas"></canvas>
 
   <div id="popup" class="popup">
     <div class="popup-content">
@@ -220,56 +207,30 @@
   </div>
 
   <script>
-    /* 🎈 (1) Կոնֆետտի անիմացիա */
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const confetti = Array.from({length: 120}, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height - canvas.height,
-      r: Math.random() * 6 + 2,
-      d: Math.random() * 0.5 + 0.5,
-      color: `hsl(${Math.random() * 360}, 70%, 60%)`
-    }));
-    function drawConfetti() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach(c => {
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-        ctx.fillStyle = c.color;
-        ctx.fill();
-      });
-      confetti.forEach(c => {
-        c.y += c.d * 2;
-        if (c.y > canvas.height) {
-          c.y = -10;
-          c.x = Math.random() * canvas.width;
-        }
-      });
-      requestAnimationFrame(drawConfetti);
-    }
-    drawConfetti();
-
-    /* 🎵 (3) Երաժշտության կոճակի գործողություն */
-    document.getElementById("music-btn").addEventListener("click", () => {
+    /* 🎵 (1) Автоматическое воспроизведение музыки через 0.8 секунды */
+    window.addEventListener("load", () => {
       const music = document.getElementById("bg-music");
-      music.play();
-      document.getElementById("music-btn").style.display = "none";
+      // Попытка автозапуска после задержки (обходит блокировку)
+      setTimeout(() => {
+        music.play().catch(() => {
+          // Если браузер блокирует, включим при первом клике
+          document.body.addEventListener("click", () => music.play(), { once: true });
+        });
+      }, 800);
     });
 
-    /* 🧸 (7) Գաղտնի հատված՝ 5 անգամ սեղմել քարտիկի վրա */
+    /* 🧸 (7) Секретное сообщение при 5 кликах на карточку */
     let secretClicks = 0;
     document.getElementById("main-card").addEventListener("click", () => {
       secretClicks++;
       if (secretClicks === 5) {
-        showPopup("🧸 Սոսի պարում է 🎉");
+        showPopup("🎉 Սոսը մեծ սիրով սպասում է 🎉");
         secretClicks = 0;
       }
       setTimeout(() => secretClicks = 0, 2000);
     });
 
-    /* Հիմնական countdown-ը (unchanged) */
+    /* Таймер обратного отсчёта */
     function startCountdown() {
       const targetDate = new Date("2025-11-27T18:00:00");
       const countdownEl = document.getElementById("countdown");
@@ -296,17 +257,16 @@
     }
     startCountdown();
     
-    /* Հիմնական ձևը (unchanged registration logic) */
+    /* Обработка формы */
     document.getElementById("rsvpForm").addEventListener("submit", function(e){
       e.preventDefault();
 
       const name = document.getElementById("name").value;
-      const name_ch = document.getElementById("name").value.trim();
       const phone = document.getElementById("phone").value.trim();
       const count = document.getElementById("count").value.trim();
       const status = document.getElementById("status").value;
 
-      if (!name_ch || !phone || !count || !status) {
+      if (!name.trim() || !phone || !count || !status) {
           showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
           return;
       }
@@ -314,42 +274,70 @@
       fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
         method: "POST",
         body: JSON.stringify({
-          data: [{
-            name: name,
-            phone: phone,
-            count: count,
-            status: status
-          }]
+          data: [{ name, phone, count, status }]
         }),
         headers: { "Content-Type": "application/json" }
       })
       .then(res => res.json())
-      .then(data => {
+      .then(() => {
         showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
         document.getElementById("rsvpForm").reset();
-        celebrate(); // 🎁 (4) Ավելացված է՝ հաջող գրանցման տոնական անիմացիա
+        celebrate(); // 💥 Запуск конфетти
       })
-      .catch(err => {
+      .catch(() => {
         showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
       });
     });
 
-    /* 🎁 (4) Հաջող գրանցման ժամանակ՝ պարգևի անիմացիա */
+    /* 💥 (4) Конфетти-анимация вместо подарка */
     function celebrate() {
-      const gift = document.createElement("div");
-      gift.innerHTML = "🎁";
-      gift.style.position = "fixed";
-      gift.style.fontSize = "60px";
-      gift.style.bottom = "-100px";
-      gift.style.left = Math.random() * 80 + "%";
-      gift.style.transition = "all 4s ease-out";
-      gift.style.zIndex = "1000";
-      document.body.appendChild(gift);
-      setTimeout(() => gift.style.bottom = "120%", 100);
-      setTimeout(() => gift.remove(), 4000);
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      const confetti = [];
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Генерируем частицы конфетти
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + Math.random() * 100,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 0.5 + 0.3,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          tilt: Math.random() * 10 - 5,
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach((c) => {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+          ctx.fillStyle = c.color;
+          ctx.fill();
+        });
+        update();
+      }
+
+      function update() {
+        for (let i = 0; i < confetti.length; i++) {
+          const c = confetti[i];
+          c.y -= c.d * 10;
+          c.x += Math.sin(c.tilt / 10);
+          c.tilt += 1;
+          if (c.y < -20) confetti.splice(i, 1);
+        }
+      }
+
+      let animation = setInterval(() => {
+        draw();
+        if (confetti.length === 0) clearInterval(animation);
+      }, 30);
     }
 
-    /* Հիմնական popup ֆունկցիան */
+    /* Всплывающее окно */
     function showPopup(message) {
       const popup = document.getElementById("popup");
       document.getElementById("popup-message").innerHTML = message;
@@ -370,7 +358,6 @@
       popup.classList.add("fade-out");
       setTimeout(() => { popup.style.display = "none"; }, 500);
     }
-
   </script>
 </body>
 </html>

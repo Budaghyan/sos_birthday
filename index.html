@@ -214,26 +214,35 @@
         return;
       }
 
-    fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
-      method: "POST",
-      body: JSON.stringify({
-        data: [{
-          name: name,
-          phone: document.getElementById("phone").value,
-          count: document.getElementById("count").value,
-          status: document.getElementById("status").value
-        }]
-      }),
-      headers: { "Content-Type": "application/json" }
-    })
-    .then(res => res.json())
-    .then(data => {
-      showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
-      document.getElementById("rsvpForm").reset();
-    })
-    .catch(err => {
-      showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
-    });
+    const SHEETDB_URL = "https://sheetdb.io/api/v1/73phymm5nctlc";
+
+    try {
+      const checkRes = await fetch(`${SHEETDB_URL}/search?phone=${encodeURIComponent(phone)}`);
+      const existing = await checkRes.json();
+
+      if (existing.length > 0) {
+        showPopup(`Հարգելի <b>${name}</b>, Դուք արդեն գրանցվել եք։`);
+        return;
+      }
+
+      const res = await fetch(SHEETDB_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [{ name, phone, count, status }]
+        })
+      });
+
+      if (res.ok) {
+        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
+        document.getElementById("rsvpForm").reset();
+      } else {
+        showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
+      }
+    } catch (error) {
+      console.error(error);
+      showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր`);
+    }
   });
   
   function showPopup(message) {
@@ -260,6 +269,7 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 
 
 

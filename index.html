@@ -297,7 +297,7 @@
     });
   });
 
-  /* 💥 Конфетти-анимация */
+    /* 💥 Улучшенная конфетти-анимация с автозатуханием */
   function celebrate() {
     const canvas = document.getElementById("confetti-canvas");
     const ctx = canvas.getContext("2d");
@@ -306,42 +306,99 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    for (let i = 0; i < 150; i++) {
+    const shapes = ["circle", "square", "triangle", "ribbon"];
+    let opacity = 1.0; // для плавного исчезновения
+
+    // 🎨 Генерация частиц конфетти
+    for (let i = 0; i < 180; i++) {
       confetti.push({
         x: Math.random() * canvas.width,
-        y: canvas.height + Math.random() * 100,
+        y: Math.random() * -canvas.height,
         r: Math.random() * 6 + 4,
-        d: Math.random() * 0.5 + 0.3,
+        d: Math.random() * 0.5 + 0.5,
         color: `hsl(${Math.random() * 360}, 100%, 60%)`,
         tilt: Math.random() * 10 - 5,
+        tiltAngle: 0,
+        tiltAngleIncrement: (Math.random() * 0.07) + 0.02,
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: Math.random() * 5 - 2.5,
       });
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach((c) => {
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-        ctx.fillStyle = c.color;
-        ctx.fill();
-      });
-      update();
+    // 🖌️ Рисуем каждую частицу
+    function drawConfetti(c) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((c.rotation * Math.PI) / 180);
+      ctx.globalAlpha = opacity;
+      ctx.fillStyle = c.color;
+
+      switch (c.shape) {
+        case "circle":
+          ctx.beginPath();
+          ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        case "square":
+          ctx.fillRect(-c.r / 2, -c.r / 2, c.r, c.r);
+          break;
+        case "triangle":
+          ctx.beginPath();
+          ctx.moveTo(0, -c.r);
+          ctx.lineTo(c.r, c.r);
+          ctx.lineTo(-c.r, c.r);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case "ribbon":
+          ctx.beginPath();
+          ctx.ellipse(0, 0, c.r * 1.5, c.r / 3, 0, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+      }
+
+      ctx.restore();
     }
 
-    function update() {
+    // 🔄 Обновляем позиции и вращения
+    function updateConfetti() {
       for (let i = 0; i < confetti.length; i++) {
         const c = confetti[i];
-        c.y -= c.d * 10;
-        c.x += Math.sin(c.tilt / 10);
-        c.tilt += 1;
-        if (c.y < -20) confetti.splice(i, 1);
+        c.y += c.d * 7;
+        c.x += Math.sin(c.tiltAngle) * 2;
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.rotation += c.rotationSpeed;
+
+        if (c.y > canvas.height + 20) {
+          c.y = -10;
+          c.x = Math.random() * canvas.width;
+        }
       }
     }
 
-    let animation = setInterval(() => {
-      draw();
-      if (confetti.length === 0) clearInterval(animation);
-    }, 30);
+    // 🌀 Основной цикл анимации
+    let animationFrame;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(drawConfetti);
+      updateConfetti();
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // ⏳ Через 7 секунд — плавное исчезновение
+    setTimeout(() => {
+      const fade = setInterval(() => {
+        opacity -= 0.05;
+        if (opacity <= 0) {
+          clearInterval(fade);
+          cancelAnimationFrame(animationFrame);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }, 100);
+    }, 7000);
   }
 
   /* 🎵 (2) Останавливаем музыку при закрытии/переключении вкладки */
@@ -381,4 +438,5 @@
 </script>
 </body>
 </html>
+
 

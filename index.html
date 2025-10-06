@@ -124,17 +124,14 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
+      margin: 5px;
     }
     
     .popup-content button:hover { background: #666; }
 
-    .popup.fade-out { animation: fadeOut 0.5s forwards; }
-    
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-
     #countdown { font-size: 1.3em; color: #fff; margin: 20px 0; }
 
-    #music-btn { display: none; } /* кнопка музыки скрыта */
+    #music-btn { display: none; } 
 
     #confetti-canvas {
       position: fixed;
@@ -155,6 +152,7 @@
   <div id="popup" class="popup">
     <div class="popup-content">
       <p id="popup-message"></p>
+      <button id="add-calendar-btn" style="display:none;">Ավելացնել օրացույցում</button>
       <button onclick="closePopup()">Փակել</button>
     </div>
   </div>
@@ -190,14 +188,6 @@ function tryPlayMusic() { music.play().catch(() => {}); }
   window.addEventListener(evt, tryPlayMusic, { once: true });
 });
 window.addEventListener("load", () => { setTimeout(() => { music.play().catch(() => {}); }, 800); });
-
-// Секретное сообщение
-let secretClicks = 0;
-document.getElementById("main-card").addEventListener("click", () => {
-  secretClicks++;
-  if (secretClicks === 5) { showPopup("🎉 Սոսը մեծ սիրով սպասում է ձեզ 🎉"); secretClicks=0; }
-  setTimeout(()=>secretClicks=0,2000);
-});
 
 // Таймер обратного отсчёта
 function startCountdown() {
@@ -240,52 +230,55 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
   .then(()=>{
     const popupMessage = `Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`;
     showPopup(popupMessage);
-    celebrate();
 
-    const eventTitle = "Սոսի 5-ամյակի Ծննդյան Հրավեր";
-    const eventLocation = "Կիլիկիո գարդեն";
-    const eventDescription = "Մասնակցել Սոսի ծննդյան և մատաղի արարողությանը";
-    
-    // Преобразуем дату в формат YYYYMMDDTHHMMSS
-    function formatDateForICS(date) {
-      const pad = n => n.toString().padStart(2, '0');
-      return date.getFullYear() +
-             pad(date.getMonth()+1) +
-             pad(date.getDate()) +
-             "T" +
-             pad(date.getHours()) +
-             pad(date.getMinutes()) +
-             pad(date.getSeconds());
-    }
-    
-    const start = new Date("2025-11-27T18:00:00");
-    const end = new Date("2025-11-27T23:30:00");
-    
-    const startDate = formatDateForICS(start);
-    const endDate = formatDateForICS(end);
-    
-    // Детекция мобильного устройства
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if(isMobile){
-      const icsContent = `
-      BEGIN:VCALENDAR
-      VERSION:2.0
-      BEGIN:VEVENT
-      SUMMARY:${eventTitle}
-      DTSTART:${startDate}
-      DTEND:${endDate}
-      LOCATION:${eventLocation}
-      DESCRIPTION:${eventDescription}
-      END:VEVENT
-      END:VCALENDAR`.trim();
-    
-      const encodedUri = encodeURI("data:text/calendar;charset=utf8," + icsContent);
-      window.open(encodedUri, "_blank");
-    } else {
-      const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
-      window.open(googleUrl, "_blank");
-    }
+    // Показать кнопку календаря
+    const calendarBtn = document.getElementById("add-calendar-btn");
+    calendarBtn.style.display = "inline-block";
+
+    calendarBtn.onclick = () => {
+      const eventTitle = "Սոսի 5-ամյակի Ծննդյան Հրավեր";
+      const eventLocation = "Կիլիկիո գարդեն";
+      const eventDescription = "Մասնակցել Սոսի ծննդյան և մատաղի արարողությանը";
+      
+      const start = new Date("2025-11-27T18:00:00");
+      const end = new Date("2025-11-27T23:30:00");
+      
+      function formatDateForICS(date) {
+        const pad = n => n.toString().padStart(2,'0');
+        return date.getFullYear() +
+               pad(date.getMonth()+1) +
+               pad(date.getDate()) +
+               "T" +
+               pad(date.getHours()) +
+               pad(date.getMinutes()) +
+               pad(date.getSeconds());
+      }
+
+      const startDate = formatDateForICS(start);
+      const endDate = formatDateForICS(end);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if(isMobile){
+        const icsContent = `
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        BEGIN:VEVENT
+        SUMMARY:${eventTitle}
+        DTSTART:${startDate}
+        DTEND:${endDate}
+        LOCATION:${eventLocation}
+        DESCRIPTION:${eventDescription}
+        END:VEVENT
+        END:VCALENDAR`.trim();
+
+        const encodedUri = encodeURI("data:text/calendar;charset=utf8," + icsContent);
+        window.open(encodedUri, "_blank");
+      } else {
+        const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
+        window.open(googleUrl, "_blank");
+      }
+    };
+
     document.getElementById("rsvpForm").reset();
   })
   .catch(()=>{
@@ -361,9 +354,8 @@ function showPopup(msg){
   document.getElementById("popup-message").innerHTML=msg;
   popup.style.display="flex";
   popup.classList.remove("fade-out");
-  setTimeout(()=>{ popup.classList.add("fade-out"); setTimeout(()=>{ popup.style.display="none"; },500); },4500);
 }
-function closePopup(){ const popup=document.getElementById("popup"); popup.classList.add("fade-out"); setTimeout(()=>{ popup.style.display="none"; },500); }
+function closePopup(){ const popup=document.getElementById("popup"); popup.style.display="none"; }
 </script>
 </body>
 </html>

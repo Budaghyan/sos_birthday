@@ -288,9 +288,53 @@
     })
     .then(res => res.json())
     .then(() => {
-      showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
-      document.getElementById("rsvpForm").reset();
-      celebrate(); // 💥 Запуск конфетти
+      const popupMessage = `Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`;
+      showPopup(popupMessage);
+    
+      // 💥 Запуск конфетти
+      celebrate();
+    
+      const eventTitle = `Սոսի 5-ամյակի Ծննդյան Հրավեր`;
+      const eventLocation = "Կիլիկիո գարդեն";
+      const eventDescription = `Մասնակցելու Սոսի ծննդյան և մատաղի արարողությանը`;
+    
+      // Формат даты для Google Calendar
+      const startDate = "20251127T180000";
+      const endDate   = "20251127T233000";
+    
+      // Проверка, мобильное устройство или нет
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+      if (isMobile) {
+        // Создаем ICS файл для локального календаря
+        const icsContent = `
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        BEGIN:VEVENT
+        SUMMARY:${eventTitle}
+        DTSTART:${startDate}
+        DTEND:${endDate}
+        LOCATION:${eventLocation}
+        DESCRIPTION:${eventDescription}
+        END:VEVENT
+        END:VCALENDAR`.trim();
+    
+        const blob = new Blob([icsContent], { type: 'text/calendar' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'sos_birthday.ics';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    
+      } else {
+        // Google Calendar для ПК
+        const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
+        const a = document.createElement("a");
+        a.href = calendarUrl;
+        a.target = "_blank";
+        a.click();
+      }
     })
     .catch(() => {
       showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
@@ -438,6 +482,7 @@
 </script>
 </body>
 </html>
+
 
 
 

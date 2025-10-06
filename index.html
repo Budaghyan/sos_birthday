@@ -239,10 +239,10 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       const eventTitle = "Սոսի 5-ամյակի Ծննդյան Հրավեր";
       const eventLocation = "Կիլիկիո գարդեն";
       const eventDescription = "Մասնակցել Սոսի ծննդյան և մատաղի արարողությանը";
-      
+    
       const start = new Date("2025-11-27T18:00:00");
       const end = new Date("2025-11-27T23:30:00");
-      
+    
       function formatDateForICS(date) {
         const pad = n => n.toString().padStart(2,'0');
         return date.getFullYear() +
@@ -253,12 +253,14 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
                pad(date.getMinutes()) +
                pad(date.getSeconds());
       }
-
+    
       const startDate = formatDateForICS(start);
       const endDate = formatDateForICS(end);
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      if(isMobile){
+      const ua = navigator.userAgent;
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isAndroid = /Android/i.test(ua);
+    
+      if(isIOS || isAndroid){
         const icsContent = `
         BEGIN:VCALENDAR
         VERSION:2.0
@@ -270,10 +272,14 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
         DESCRIPTION:${eventDescription}
         END:VEVENT
         END:VCALENDAR`.trim();
-
-        const encodedUri = encodeURI("data:text/calendar;charset=utf8," + icsContent);
-        window.open(encodedUri, "_blank");
+    
+        // Для Safari/iOS открываем ICS в новой вкладке
+        const blob = new Blob([icsContent], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank'); // Safari предложит добавить в календарь
+        setTimeout(() => URL.revokeObjectURL(url), 10000); // очистка
       } else {
+        // Для ПК открываем Google Calendar
         const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
         window.open(googleUrl, "_blank");
       }
@@ -359,3 +365,4 @@ function closePopup(){ const popup=document.getElementById("popup"); popup.style
 </script>
 </body>
 </html>
+

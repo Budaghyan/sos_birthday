@@ -272,13 +272,26 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
   e.preventDefault();
 
   const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
+  let phone = document.getElementById("phone").value.trim();
   const count = document.getElementById("count").value.trim();
   const status = document.getElementById("status").value;
 
   if (!name || !phone || !count || !status) {
     showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
     return;
+  }
+
+  // 📞 Нормализуем номер телефона (оставляем только цифры)
+  phone = phone.replace(/\D/g, "");
+
+  // Если номер начинается с "0" — превращаем в международный (374)
+  if (phone.startsWith("0")) {
+    phone = "374" + phone.slice(1);
+  }
+
+  // Если номер уже с +374 — просто удаляем +
+  if (phone.startsWith("3740")) {
+    phone = "374" + phone.slice(4);
   }
 
   const sheetAPI = "https://sheetdb.io/api/v1/73phymm5nctlc";
@@ -290,13 +303,21 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       if (Array.isArray(data) && data.length > 0) {
         // Пользователь уже зарегистрирован
         showPopup(`Հարգելի <b>${name}</b>, դուք արդեն գրանցված եք։`);
+        document.getElementById("rsvpForm").reset(); // 🧹 Очистить поля
         return;
       }
 
-      // Если нет — отправляем данные
+      // Если нет — сохраняем нормализованный номер
       return fetch(sheetAPI, {
         method: "POST",
-        body: JSON.stringify({ data: [{ name, phone, count, status }] }),
+        body: JSON.stringify({
+          data: [{ 
+            name: name,
+            phone: phone,   // 📲 сохраняем только цифры, без +, пробелов и т.п.
+            count: count,
+            status: status
+          }]
+        }),
         headers: { "Content-Type": "application/json" }
       })
       .then(res => res.json())
@@ -310,7 +331,6 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
     });
 });
-
 
     /* 💥 Улучшенная конфетти-анимация с автозатуханием */
   function celebrate() {
@@ -453,4 +473,5 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
 </script>
 </body>
 </html>
+
 

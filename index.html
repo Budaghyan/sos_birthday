@@ -302,7 +302,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
     .then(data => {
       if (Array.isArray(data) && data.length > 0) {
         // Пользователь уже зарегистрирован
-        showPopup(`Հարգելի <b>${name}</b>, դուք արդեն գրանցված եք։`);
+        showPopup(`Հարգելի <b>${name}</b>, ձեր հրավերն արդեն հաստատված է։ Սիրով կսպասենք ձեզ։`);
         document.getElementById("rsvpForm").reset(); // 🧹 Очистить поля
         return;
       }
@@ -473,6 +473,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
 </script>
 </body>
 </html>
+
 
 
 

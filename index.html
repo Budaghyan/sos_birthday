@@ -268,34 +268,49 @@
   startCountdown();
 
   /* Обработка формы */
-  document.getElementById("rsvpForm").addEventListener("submit", function(e){
-    e.preventDefault();
+document.getElementById("rsvpForm").addEventListener("submit", function(e){
+  e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value.trim();
-    const count = document.getElementById("count").value.trim();
-    const status = document.getElementById("status").value;
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const count = document.getElementById("count").value.trim();
+  const status = document.getElementById("status").value;
 
-    if (!name.trim() || !phone || !count || !status) {
-      showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
-      return;
-    }
+  if (!name || !phone || !count || !status) {
+    showPopup("Խնդրում ենք լրացնել բոլոր պարտադիր նշված դաշտերը։");
+    return;
+  }
 
-    fetch("https://sheetdb.io/api/v1/73phymm5nctlc", {
-      method: "POST",
-      body: JSON.stringify({ data: [{ name, phone, count, status }] }),
-      headers: { "Content-Type": "application/json" }
-    })
+  const sheetAPI = "https://sheetdb.io/api/v1/73phymm5nctlc";
+
+  // 🟢 Проверяем, есть ли уже регистрация по этому телефону
+  fetch(`${sheetAPI}/search?phone=${encodeURIComponent(phone)}`)
     .then(res => res.json())
-    .then(() => {
-      showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
-      document.getElementById("rsvpForm").reset();
-      celebrate(); // 💥 Запуск конфетти
+    .then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // Пользователь уже зарегистрирован
+        showPopup(`Հարգելի <b>${name}</b>, դուք արդեն գրանցված եք։`);
+        return;
+      }
+
+      // Если нет — отправляем данные
+      return fetch(sheetAPI, {
+        method: "POST",
+        body: JSON.stringify({ data: [{ name, phone, count, status }] }),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.json())
+      .then(() => {
+        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
+        document.getElementById("rsvpForm").reset();
+        celebrate(); // 💥 Конфетти
+      });
     })
     .catch(() => {
       showPopup(`Հարգելի <b>${name}</b>, գրանցվելու ընթացքում առաջացել է խնդիր, խնդրում ենք փորձեք կրկին`);
     });
-  });
+});
+
 
     /* 💥 Улучшенная конфетти-анимация с автозатуханием */
   function celebrate() {
@@ -438,3 +453,4 @@
 </script>
 </body>
 </html>
+

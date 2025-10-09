@@ -358,7 +358,7 @@ function generateCalendarFile() {
     return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   }
 
-  // ICS файл
+  // ICS файл для iCloud / всех десктопов
   const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -371,39 +371,36 @@ DTSTART:${formatDateToICS(startDate)}
 DTEND:${formatDateToICS(endDate)}
 END:VEVENT
 END:VCALENDAR`;
-
   const blob = new Blob([icsContent], { type: "text/calendar" });
-  const url = URL.createObjectURL(blob);
-  document.getElementById("calendar-link").href = url;
+  const icsURL = URL.createObjectURL(blob);
+  const icloudBtn = document.getElementById("calendar-link");
+  icloudBtn.href = icsURL;
 
-  // Google Calendar
-  const start = encodeURIComponent(formatDateToICS(startDate));
-  const end = encodeURIComponent(formatDateToICS(endDate));
-  const webLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+  // Google Calendar ссылка
+  const start = formatDateToICS(startDate);
+  const end = formatDateToICS(endDate);
+  const googleLink = `intent://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}#Intent;scheme=https;package=com.google.android.calendar;end`;
+  const googleBtn = document.getElementById("google-calendar-link");
+  googleBtn.href = googleLink;
 
-  // Ссылка для мобильного приложения
-  const appLink = `googlecalendar://?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+  // Определение платформы
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
 
-  const googleLinkEl = document.getElementById("google-calendar-link");
-  
-  // При клике пробуем открыть приложение, если не получится — открываем веб
-  googleLinkEl.onclick = (e) => {
-    e.preventDefault();
-    const now = Date.now();
-    // Создаем iframe для попытки открытия приложения
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = appLink;
-    document.body.appendChild(iframe);
+  // Показываем только нужную кнопку
+  icloudBtn.style.display = "none";
+  googleBtn.style.display = "none";
 
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-      // Если приложение не сработало, открываем веб-ссылку
-      if (Date.now() - now < 1500) {
-        window.open(webLink, "_blank");
-      }
-    }, 1000);
-  };
+  if (isAndroid) {
+    googleBtn.style.display = "inline-block";
+  } else if (isIOS) {
+    icloudBtn.style.display = "inline-block";
+  } else {
+    // Desktop: показываем обе кнопки
+    icloudBtn.style.display = "inline-block";
+    googleBtn.style.display = "inline-block";
+  }
 }
 
 function celebrate() {
@@ -534,4 +531,5 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 

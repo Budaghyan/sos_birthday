@@ -347,18 +347,18 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
 });
 
 function generateCalendarFile() {
-      const eventTitle = "🎂 Սոսի 5-րդ տարեդարձը";
-      const eventDescription = "Սիրով հրավիրում ենք մասնակցելու Սոսի ծննդյան և մատաղի արարողությանը։";
-      const eventLocation = "Կիլիկիո գարդեն";
-      const startDate = new Date("2025-11-27T18:00:00+04:00");
-      const endDate = new Date("2025-11-27T23:30:00+04:00");
+  const eventTitle = "🎂 Սոսի 5-րդ տարեդարձը 🎂";
+  const eventDescription = "Սիրով հրավիրում ենք մասնակցելու Սոսի ծննդյան և մատաղի արարողությանը։";
+  const eventLocation = "Կիլիկիո գարդեն";
+  const startDate = new Date("2025-11-27T18:00:00+04:00");
+  const endDate = new Date("2025-11-27T23:30:00+04:00");
 
-      function formatDateToICS(date) {
-        return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-      }
+  function formatDateToICS(date) {
+    return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  }
 
-      // ICS файл для iCloud
-      const icsContent = `
+  // ICS файл для iCloud
+  const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
@@ -371,28 +371,35 @@ DTEND:${formatDateToICS(endDate)}
 END:VEVENT
 END:VCALENDAR`;
 
-      const blob = new Blob([icsContent], { type: "text/calendar" });
-      document.getElementById("calendar-link").href = URL.createObjectURL(blob);
+  const blob = new Blob([icsContent], { type: "text/calendar" });
+  document.getElementById("calendar-link").href = URL.createObjectURL(blob);
 
-      // Google Calendar (веб-ссылка)
-      const start = startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-      const end = endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-      const googleLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
-      const googleLinkEl = document.getElementById("google-calendar-link");
-      googleLinkEl.href = googleLink;
+  // Google Calendar (веб-ссылка)
+  const start = startDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const end = endDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const googleLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+  const googleLinkEl = document.getElementById("google-calendar-link");
 
-      // Определение платформы
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-        // iOS → скрываем Google Calendar
-        googleLinkEl.style.display = "none";
-      } else {
-        // Android и десктоп → скрываем iCloud
-        document.getElementById("calendar-link").style.display = "none";
-      }
+  googleLinkEl.href = googleLink;
 
-      document.getElementById("calendar-section").style.display = "flex";
-    }
+  // ✅ Обновлённая проверка платформы
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (isIOS) {
+    // iOS: показываем iCloud, скрываем Google
+    document.getElementById("calendar-link").style.display = "inline-block";
+    googleLinkEl.style.display = "none";
+  } else {
+    // Android и десктоп: показываем Google, скрываем iCloud
+    document.getElementById("calendar-link").style.display = "none";
+    googleLinkEl.style.display = "inline-block";
+  }
+
+  // Показываем секцию кнопок
+  document.getElementById("calendar-section").style.display = "flex";
+}
 
 function celebrate() {
   const canvas = document.getElementById("confetti-canvas");
@@ -522,7 +529,3 @@ function closePopup() {
   </script>
 </body>
 </html>
-
-
-
-

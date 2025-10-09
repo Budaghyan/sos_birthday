@@ -150,12 +150,10 @@
       margin: 20px 0;
     }
 
-    /* 🎵 (3) Кнопка музыки (теперь скрытая) */
     #music-btn {
-      display: none; /* кнопка теперь скрыта */
+      display: none;
     }
 
-    /* 💥 Конфетти-слой */
     #confetti-canvas {
       position: fixed;
       bottom: 0;
@@ -168,13 +166,11 @@
   </style>
 </head>
 <body>
-  <!-- 🎵 (3) Музыка -->
   <audio id="bg-music" loop>
     <source src="music/happy_birthday.mp3" type="audio/mpeg">
   </audio>
   <button id="music-btn">🔊 Պարե՞նք</button>
 
-  <!-- 💥 Canvas для конфетти -->
   <canvas id="confetti-canvas"></canvas>
 
   <div id="popup" class="popup">
@@ -182,6 +178,18 @@
       <p id="popup-message"></p>
       <button onclick="closePopup()">Փակել</button>
     </div>
+  </div>
+
+  <!-- 📅 Блок добавления в календарь -->
+  <div id="calendar-section" style="display:none; margin-top:20px;">
+    <a id="calendar-link" href="#" download="Sosi_birthday.ics"
+       style="color:#fff; background:#333; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin:5px;">
+      📅 Ավելացնել օրացույցին
+    </a>
+    <a id="google-calendar-link" href="#" target="_blank"
+       style="color:#fff; background:#4285F4; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin:5px;">
+      🌐 Բացնել Google օրացույցով
+    </a>
   </div>
 
   <div class="card" id="main-card">
@@ -209,27 +217,18 @@
   <script>
   const music = document.getElementById("bg-music");
 
-  /* 🎵 (1) Автозапуск при любых действиях пользователя */
   function tryPlayMusic() {
     music.play().catch(() => {});
   }
-
-  // События, которые активируют музыку
   ["click", "touchstart", "input", "scroll"].forEach(evt => {
     window.addEventListener(evt, tryPlayMusic, { once: true });
   });
-
-  // Попытка автозапуска через 0.8 сек после загрузки (если не заблокировано)
   window.addEventListener("load", () => {
     setTimeout(() => {
-      music.play().catch(() => {
-        // Если браузер блокирует, ждём взаимодействия
-        console.log("⏸️ Автозапуск заблокирован, ждём взаимодействия...");
-      });
+      music.play().catch(() => {});
     }, 800);
   });
 
-  /* 🧸 (7) Секретное сообщение при 5 кликах на карточку */
   let secretClicks = 0;
   document.getElementById("main-card").addEventListener("click", () => {
     secretClicks++;
@@ -240,7 +239,6 @@
     setTimeout(() => secretClicks = 0, 2000);
   });
 
-  /* Таймер обратного отсчёта */
   function startCountdown() {
     const targetDate = new Date("2025-11-27T18:00:00");
     const countdownEl = document.getElementById("countdown");
@@ -267,7 +265,6 @@
   }
   startCountdown();
 
-  /* Обработка формы */
 document.getElementById("rsvpForm").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -281,50 +278,35 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
     return;
   }
 
-  // 📞 Нормализуем номер телефона (оставляем только цифры)
   phone = phone.replace(/\D/g, "");
-
-  // Если номер начинается с "0" — превращаем в международный (374)
-  if (phone.startsWith("0")) {
-    phone = "374" + phone.slice(1);
-  }
-
-  // Если номер уже с +374 — просто удаляем +
-  if (phone.startsWith("3740")) {
-    phone = "374" + phone.slice(4);
-  }
+  if (phone.startsWith("0")) phone = "374" + phone.slice(1);
+  if (phone.startsWith("3740")) phone = "374" + phone.slice(4);
 
   const sheetAPI = "https://sheetdb.io/api/v1/73phymm5nctlc";
 
-  // 🟢 Проверяем, есть ли уже регистрация по этому телефону
   fetch(`${sheetAPI}/search?phone=${encodeURIComponent(phone)}`)
     .then(res => res.json())
     .then(data => {
       if (Array.isArray(data) && data.length > 0) {
-        // Пользователь уже зарегистрирован
         showPopup(`Հարգելի <b>${name}</b>, ձեր հրավերն արդեն հաստատված է։ Սիրով կսպասենք ձեզ։`);
-        document.getElementById("rsvpForm").reset(); // 🧹 Очистить поля
+        document.getElementById("rsvpForm").reset();
         return;
       }
 
-      // Если нет — сохраняем нормализованный номер
       return fetch(sheetAPI, {
         method: "POST",
         body: JSON.stringify({
-          data: [{ 
-            name: name,
-            phone: phone,   // 📲 сохраняем только цифры, без +, пробелов и т.п.
-            count: count,
-            status: status
-          }]
+          data: [{ name, phone, count, status }]
         }),
         headers: { "Content-Type": "application/json" }
       })
       .then(res => res.json())
       .then(() => {
         showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
+        celebrate();
         document.getElementById("rsvpForm").reset();
-        celebrate(); // 💥 Конфетти
+        generateCalendarFile();
+        document.getElementById("calendar-section").style.display = "block";
       });
     })
     .catch(() => {
@@ -332,149 +314,154 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
     });
 });
 
-    /* 💥 Улучшенная конфетти-анимация с автозатуханием */
-  function celebrate() {
-    const canvas = document.getElementById("confetti-canvas");
-    const ctx = canvas.getContext("2d");
-    const confetti = [];
+function generateCalendarFile() {
+  const eventTitle = "🎂 Սոսի 5-րդ տարեդարձը";
+  const eventDescription = "Սիրով հրավիրում ենք մասնակցելու Սոսի ծննդյան և մատաղի արարողությանը։";
+  const eventLocation = "Կիլիկիո գարդեն";
+  const startDate = new Date("2025-11-27T18:00:00+04:00");
+  const endDate = new Date("2025-11-27T22:00:00+04:00");
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const shapes = ["circle", "square", "triangle", "ribbon"];
-    let opacity = 1.0; // для плавного исчезновения
-
-    // 🎨 Генерация частиц конфетти
-    for (let i = 0; i < 180; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * 0.5 + 0.5,
-        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-        tilt: Math.random() * 10 - 5,
-        tiltAngle: 0,
-        tiltAngleIncrement: (Math.random() * 0.07) + 0.02,
-        shape: shapes[Math.floor(Math.random() * shapes.length)],
-        rotation: Math.random() * 360,
-        rotationSpeed: Math.random() * 5 - 2.5,
-      });
-    }
-
-    // 🖌️ Рисуем каждую частицу
-    function drawConfetti(c) {
-      ctx.save();
-      ctx.translate(c.x, c.y);
-      ctx.rotate((c.rotation * Math.PI) / 180);
-      ctx.globalAlpha = opacity;
-      ctx.fillStyle = c.color;
-
-      switch (c.shape) {
-        case "circle":
-          ctx.beginPath();
-          ctx.arc(0, 0, c.r, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-        case "square":
-          ctx.fillRect(-c.r / 2, -c.r / 2, c.r, c.r);
-          break;
-        case "triangle":
-          ctx.beginPath();
-          ctx.moveTo(0, -c.r);
-          ctx.lineTo(c.r, c.r);
-          ctx.lineTo(-c.r, c.r);
-          ctx.closePath();
-          ctx.fill();
-          break;
-        case "ribbon":
-          ctx.beginPath();
-          ctx.ellipse(0, 0, c.r * 1.5, c.r / 3, 0, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-      }
-
-      ctx.restore();
-    }
-
-    // 🔄 Обновляем позиции и вращения
-    function updateConfetti() {
-      for (let i = 0; i < confetti.length; i++) {
-        const c = confetti[i];
-        c.y += c.d * 7;
-        c.x += Math.sin(c.tiltAngle) * 2;
-        c.tiltAngle += c.tiltAngleIncrement;
-        c.rotation += c.rotationSpeed;
-
-        if (c.y > canvas.height + 20) {
-          c.y = -10;
-          c.x = Math.random() * canvas.width;
-        }
-      }
-    }
-
-    // 🌀 Основной цикл анимации
-    let animationFrame;
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach(drawConfetti);
-      updateConfetti();
-      animationFrame = requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    // ⏳ Через 7 секунд — плавное исчезновение
-    setTimeout(() => {
-      const fade = setInterval(() => {
-        opacity -= 0.05;
-        if (opacity <= 0) {
-          clearInterval(fade);
-          cancelAnimationFrame(animationFrame);
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      }, 100);
-    }, 7000);
+  function formatDateToICS(date) {
+    return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   }
 
-  /* 🎵 (2) Останавливаем музыку при закрытии/переключении вкладки */
-  window.addEventListener("beforeunload", () => {
+  const icsContent = `
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+SUMMARY:${eventTitle}
+DESCRIPTION:${eventDescription}
+LOCATION:${eventLocation}
+DTSTART:${formatDateToICS(startDate)}
+DTEND:${formatDateToICS(endDate)}
+END:VEVENT
+END:VCALENDAR`;
+
+  const blob = new Blob([icsContent], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  document.getElementById("calendar-link").href = url;
+
+  const start = encodeURIComponent(formatDateToICS(startDate));
+  const end = encodeURIComponent(formatDateToICS(endDate));
+  const googleLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+  document.getElementById("google-calendar-link").href = googleLink;
+}
+
+function celebrate() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  const confetti = [];
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const shapes = ["circle", "square", "triangle", "ribbon"];
+  let opacity = 1.0;
+
+  for (let i = 0; i < 180; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 0.5 + 0.5,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+      tilt: Math.random() * 10 - 5,
+      tiltAngle: 0,
+      tiltAngleIncrement: (Math.random() * 0.07) + 0.02,
+      shape: shapes[Math.floor(Math.random() * shapes.length)],
+      rotation: Math.random() * 360,
+      rotationSpeed: Math.random() * 5 - 2.5,
+    });
+  }
+
+  function drawConfetti(c) {
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate((c.rotation * Math.PI) / 180);
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = c.color;
+
+    switch (c.shape) {
+      case "circle": ctx.beginPath(); ctx.arc(0, 0, c.r, 0, Math.PI * 2); ctx.fill(); break;
+      case "square": ctx.fillRect(-c.r / 2, -c.r / 2, c.r, c.r); break;
+      case "triangle":
+        ctx.beginPath();
+        ctx.moveTo(0, -c.r);
+        ctx.lineTo(c.r, c.r);
+        ctx.lineTo(-c.r, c.r);
+        ctx.closePath();
+        ctx.fill();
+        break;
+      case "ribbon":
+        ctx.beginPath();
+        ctx.ellipse(0, 0, c.r * 1.5, c.r / 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+    }
+
+    ctx.restore();
+  }
+
+  function updateConfetti() {
+    for (const c of confetti) {
+      c.y += c.d * 7;
+      c.x += Math.sin(c.tiltAngle) * 2;
+      c.tiltAngle += c.tiltAngleIncrement;
+      c.rotation += c.rotationSpeed;
+      if (c.y > canvas.height + 20) {
+        c.y = -10;
+        c.x = Math.random() * canvas.width;
+      }
+    }
+  }
+
+  let animationFrame;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(drawConfetti);
+    updateConfetti();
+    animationFrame = requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  setTimeout(() => {
+    const fade = setInterval(() => {
+      opacity -= 0.05;
+      if (opacity <= 0) {
+        clearInterval(fade);
+        cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }, 100);
+  }, 7000);
+}
+
+window.addEventListener("beforeunload", () => {
+  music.pause();
+  music.currentTime = 0;
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
     music.pause();
     music.currentTime = 0;
-  });
+  }
+});
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      music.pause();
-      music.currentTime = 0;
-    }
-  });
-
-  /* Popup */
-  function showPopup(message) {
-    const popup = document.getElementById("popup");
-    document.getElementById("popup-message").innerHTML = message;
-
-    popup.style.display = "flex";
+function showPopup(message) {
+  const popup = document.getElementById("popup");
+  document.getElementById("popup-message").innerHTML = message;
+  popup.style.display = "flex";
+}
+function closePopup() {
+  const popup = document.getElementById("popup");
+  popup.classList.add("fade-out");
+  setTimeout(() => {
+    popup.style.display = "none";
     popup.classList.remove("fade-out");
-
-    setTimeout(() => {
-      popup.classList.add("fade-out");
-      setTimeout(() => {
-        popup.style.display = "none";
-      }, 500);
-    }, 4500);
-  }
-
-  function closePopup() {
-    const popup = document.getElementById("popup");
-    popup.classList.add("fade-out");
-    setTimeout(() => { popup.style.display = "none"; }, 500);
-  }
-</script>
+  }, 500);
+}
+  </script>
 </body>
 </html>
-
-
-
-
-

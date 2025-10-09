@@ -223,15 +223,18 @@
     <p><a href="https://yandex.com/maps/-/CLBII2kZ" style="color: #fffff0; font-size: 1.2em;"><b>Ինչպե՞ս հասնել</b></a></p>
     <h3 style="font-style: normal;">Խնդրում ենք հաստատել ձեր հրավերը ստորև</h3>
     <form id="rsvpForm">
-      <input type="text" id="name" placeholder="Անուն ազգանուն *"><br>
-      <input type="tel" id="phone" placeholder="Հեռախոսահամար * (0XXYYYYYY)" inputmode="tel"><br>
-      <input type="number" id="count" placeholder="Անձանց քանակ *" inputmode="numeric" min="1"><br>
       <select id="status">
-        <option value="" disabled selected hidden>Ընտրել *</option>
+        <option value="" disabled selected hidden>Մասնակցելո՞ւ եք *</option>
         <option value="Այո">Մեծ սիրով</option>
         <option value="Ոչ">Ցավոք ոչ</option>
       </select><br>
-      <button type="submit">Հաստատել</button>
+    
+      <div id="extra-fields" style="display: none;">
+        <input type="text" id="name" placeholder="Անուն ազգանուն *"><br>
+        <input type="tel" id="phone" placeholder="Հեռախոսահամար * (0XXYYYYYY)" inputmode="tel"><br>
+        <input type="number" id="count" placeholder="Անձանց քանակ *" inputmode="numeric" min="1"><br>
+        <button type="submit">Հաստատել</button>
+      </div>
     </form>
 
     <p id="response"></p>
@@ -288,6 +291,19 @@
   }
   startCountdown();
 
+document.getElementById("status").addEventListener("change", function () {
+  const status = this.value;
+  const fields = document.getElementById("extra-fields");
+
+  if (status === "Այո") {
+    fields.style.display = "block";
+  } else if (status === "Ոչ") {
+    fields.style.display = "none";
+    showPopup("Հուսով ենք կհանդիպենք հաջորդ տարի 😉😉", false);
+    document.getElementById("rsvpForm").reset();
+  }
+});
+
 document.getElementById("rsvpForm").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -326,16 +342,9 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       .then(res => res.json())
       .then(() => {
         document.getElementById("rsvpForm").reset();
-      
-        if (status === "Ոչ") {
-          // Пользователь отказался
-          showPopup(`Կհանդիպենք հաջորդ տարի 😉😉`, false);
-        } else {
-          // Пользователь подтвердил участие
-          showPopup(`🎉 Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք 🎉`, true);
-          generateCalendarFile();
-          celebrate();
-        }
+        showPopup(`🎉 Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք 🎉`, true);
+        generateCalendarFile();
+        celebrate();
       });
     })
     .catch(() => {
@@ -526,4 +535,5 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 

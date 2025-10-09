@@ -299,8 +299,9 @@ document.getElementById("status").addEventListener("change", function () {
     fields.style.display = "block";
   } else if (status === "Ոչ") {
     fields.style.display = "none";
-    showPopup("Հուսով ենք կհանդիպենք հաջորդ տարի 😉😉", false);
     document.getElementById("rsvpForm").reset();
+    document.getElementById("rsvpForm").style.display = "none";
+    showPopup("Հուսով ենք կհանդիպենք հաջորդ տարի 😉😉", false);
   }
 });
 
@@ -329,6 +330,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       if (Array.isArray(data) && data.length > 0) {
         showPopup(`Հարգելի <b>${name}</b>, ձեր հրավերն արդեն հաստատված է։ Սիրով կսպասենք ձեզ։`);
         document.getElementById("rsvpForm").reset();
+        document.getElementById("rsvpForm").style.display = "none";
         return;
       }
 
@@ -342,6 +344,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       .then(res => res.json())
       .then(() => {
         document.getElementById("rsvpForm").reset();
+        document.getElementById("rsvpForm").style.display = "none";
         showPopup(`🎉 Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք 🎉`, true);
         generateCalendarFile();
         celebrate();
@@ -535,5 +538,6 @@ function closePopup() {
   </script>
 </body>
 </html>
+
 
 

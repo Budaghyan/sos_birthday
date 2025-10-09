@@ -205,8 +205,8 @@
     <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popup-message">
       <!-- Кнопки добавления в календарь — теперь внутри popup и расположены над кнопкой закрытия -->
       <div id="calendar-section" aria-hidden="true" style="display:none;">
-        <a id="calendar-link" href="#" download="Sosi_birthday.ics"><i class="fa-brands fa-apple"></i> Ավելացնել iCloud օրացույցին</a>
-        <a id="google-calendar-link" href="#" target="_blank"><i class="fa-brands fa-google"></i> Ավելացնել Google օրացույցով</a>
+        <a id="calendar-link" href="#" download="Sosi_birthday.ics">📅 Ավելացնել օրացույցին</a>
+        <a id="google-calendar-link" href="#" target="_blank">🌐 Բացնել Google օրացույցով</a>
       </div>
 
       <p id="popup-message"></p>
@@ -326,7 +326,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       .then(res => res.json())
       .then(() => {
         // Показываем popup (не закрывается автоматически)
-        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`, true);
+        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
         celebrate();
         document.getElementById("rsvpForm").reset();
 
@@ -481,21 +481,12 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-function showPopup(message, showCalendar = false) {
+function showPopup(message) {
   const popup = document.getElementById("popup");
-  const calSection = document.getElementById("calendar-section");
-
-  if (!showCalendar) {
-    calSection.style.display = "none";
-  } else {
-    calSection.style.display = "flex";
-  }
-
   document.getElementById("popup-message").innerHTML = message;
   popup.style.display = "flex";
   popup.setAttribute("aria-hidden", "false");
 }
-
 function closePopup() {
   const popup = document.getElementById("popup");
   popup.classList.add("fade-out");
@@ -508,4 +499,3 @@ function closePopup() {
   </script>
 </body>
 </html>
-

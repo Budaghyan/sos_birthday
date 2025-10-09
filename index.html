@@ -358,6 +358,7 @@ function generateCalendarFile() {
     return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   }
 
+  // ICS файл
   const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
@@ -375,10 +376,34 @@ END:VCALENDAR`;
   const url = URL.createObjectURL(blob);
   document.getElementById("calendar-link").href = url;
 
+  // Google Calendar
   const start = encodeURIComponent(formatDateToICS(startDate));
   const end = encodeURIComponent(formatDateToICS(endDate));
-  const googleLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
-  document.getElementById("google-calendar-link").href = googleLink;
+  const webLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+
+  // Ссылка для мобильного приложения
+  const appLink = `googlecalendar://?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&dates=${start}/${end}`;
+
+  const googleLinkEl = document.getElementById("google-calendar-link");
+  
+  // При клике пробуем открыть приложение, если не получится — открываем веб
+  googleLinkEl.onclick = (e) => {
+    e.preventDefault();
+    const now = Date.now();
+    // Создаем iframe для попытки открытия приложения
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = appLink;
+    document.body.appendChild(iframe);
+
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      // Если приложение не сработало, открываем веб-ссылку
+      if (Date.now() - now < 1500) {
+        window.open(webLink, "_blank");
+      }
+    }, 1000);
+  };
 }
 
 function celebrate() {
@@ -509,3 +534,4 @@ function closePopup() {
   </script>
 </body>
 </html>
+

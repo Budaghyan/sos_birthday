@@ -104,10 +104,14 @@
       padding: 20px 30px;
       border-radius: 15px;
       text-align: center;
-      max-width: 300px;
-      width: 80%;
+      max-width: 360px;
+      width: 88%;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
       animation: popIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
     }
     
     @keyframes popIn {
@@ -116,11 +120,12 @@
     }
     
     .popup-content p {
-      font-size: 1.2em;
-      margin-bottom: 15px;
+      font-size: 1.05em;
+      margin: 0;
+      word-break: keep-all;
     }
     
-    .popup-content button {
+    .popup-content .popup-close-btn {
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
@@ -129,9 +134,10 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
+      width: 140px;
     }
     
-    .popup-content button:hover {
+    .popup-content .popup-close-btn:hover {
       background: #666;
     }
 
@@ -163,6 +169,28 @@
       pointer-events: none;
       z-index: 2000;
     }
+
+    /* Calendar buttons inside popup */
+    #calendar-section {
+      display: none; /* будет показываться после регистрации */
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #calendar-section a {
+      color: #fff;
+      background: #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+    }
+    #google-calendar-link {
+      background: #4285F4;
+    }
   </style>
 </head>
 <body>
@@ -173,23 +201,18 @@
 
   <canvas id="confetti-canvas"></canvas>
 
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <p id="popup-message"></p>
-      <button onclick="closePopup()">Փակել</button>
-    </div>
-  </div>
+  <div id="popup" class="popup" aria-hidden="true">
+    <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popup-message">
+      <!-- Кнопки добавления в календарь — теперь внутри popup и расположены над кнопкой закрытия -->
+      <div id="calendar-section" aria-hidden="true" style="display:none;">
+        <a id="calendar-link" href="#" download="Sosi_birthday.ics">📅 Ավելացնել օրացույցին</a>
+        <a id="google-calendar-link" href="#" target="_blank">🌐 Բացնել Google օրացույցով</a>
+      </div>
 
-  <!-- 📅 Блок добавления в календарь -->
-  <div id="calendar-section" style="display:none; margin-top:20px;">
-    <a id="calendar-link" href="#" download="Sosi_birthday.ics"
-       style="color:#fff; background:#333; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin:5px;">
-      📅 Ավելացնել օրացույցին
-    </a>
-    <a id="google-calendar-link" href="#" target="_blank"
-       style="color:#fff; background:#4285F4; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin:5px;">
-      🌐 Բացնել Google օրացույցով
-    </a>
+      <p id="popup-message"></p>
+
+      <button class="popup-close-btn" onclick="closePopup()">Փակել</button>
+    </div>
   </div>
 
   <div class="card" id="main-card">
@@ -302,11 +325,20 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       })
       .then(res => res.json())
       .then(() => {
+        // Показываем popup (не закрывается автоматически)
         showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
         celebrate();
         document.getElementById("rsvpForm").reset();
+
+        // Генерация ICS и Google Calendar ссылок — логика оставлена как есть
         generateCalendarFile();
-        document.getElementById("calendar-section").style.display = "block";
+
+        // Показываем кнопки в popup (они находятся вверху pop-up меню, над кнопкой "Փակել")
+        const calSection = document.getElementById("calendar-section");
+        if (calSection) calSection.style.display = "flex";
+
+        // Убедимся, что popup остаётся видимым (не закрывается автоматически)
+        // (ничего дополнительно не делаем — close делает только кнопка "Փակել")
       });
     })
     .catch(() => {
@@ -319,7 +351,7 @@ function generateCalendarFile() {
   const eventDescription = "Սիրով հրավիրում ենք մասնակցելու Սոսի ծննդյան և մատաղի արարողությանը։";
   const eventLocation = "Կիլիկիո գարդեն";
   const startDate = new Date("2025-11-27T18:00:00+04:00");
-  const endDate = new Date("2025-11-27T22:00:00+04:00");
+  const endDate = new Date("2025-11-27T23:30:00+04:00");
 
   function formatDateToICS(date) {
     return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -453,6 +485,7 @@ function showPopup(message) {
   const popup = document.getElementById("popup");
   document.getElementById("popup-message").innerHTML = message;
   popup.style.display = "flex";
+  popup.setAttribute("aria-hidden", "false");
 }
 function closePopup() {
   const popup = document.getElementById("popup");
@@ -460,6 +493,7 @@ function closePopup() {
   setTimeout(() => {
     popup.style.display = "none";
     popup.classList.remove("fade-out");
+    popup.setAttribute("aria-hidden", "true");
   }, 500);
 }
   </script>

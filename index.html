@@ -326,7 +326,7 @@ document.getElementById("rsvpForm").addEventListener("submit", function(e){
       .then(res => res.json())
       .then(() => {
         // Показываем popup (не закрывается автоматически)
-        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`);
+        showPopup(`Հարգելի <b>${name}</b>, դուք հաջողությամբ գրանցվեցիք`, true);
         celebrate();
         document.getElementById("rsvpForm").reset();
 
@@ -481,12 +481,21 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-function showPopup(message) {
+function showPopup(message, showCalendar = false) {
   const popup = document.getElementById("popup");
+  const calSection = document.getElementById("calendar-section");
+
+  if (!showCalendar) {
+    calSection.style.display = "none";
+  } else {
+    calSection.style.display = "flex";
+  }
+
   document.getElementById("popup-message").innerHTML = message;
   popup.style.display = "flex";
   popup.setAttribute("aria-hidden", "false");
 }
+    
 function closePopup() {
   const popup = document.getElementById("popup");
   popup.classList.add("fade-out");
@@ -499,3 +508,4 @@ function closePopup() {
   </script>
 </body>
 </html>
+

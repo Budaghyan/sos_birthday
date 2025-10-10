@@ -1,7 +1,7 @@
 html, body {
       margin: 0;
       font-family: "Comic Sans MS", cursive, sans-serif;
-      background: url("images/background.jpg") no-repeat center center fixed;
+      background: url("../images/background.jpg") no-repeat center center fixed;
       background-size: cover;
       text-align: center;
       color: #333;
@@ -154,9 +154,8 @@ html, body {
       z-index: 2000;
     }
 
-    /* Calendar buttons inside popup */
     #calendar-section {
-      display: none; /* будет показываться после регистрации */
+      display: none;
       width: 100%;
       display: flex;
       justify-content: center;
@@ -172,5 +171,5 @@ html, body {
       font-weight: bold;
       display: inline-block;
     }
-    #calendar-link { background: #34A853; } /* iCloud */
-    #google-calendar-link { background: #4285F4; } /* Google */
+    #calendar-link { background: #34A853; }
+    #google-calendar-link { background: #4285F4; }

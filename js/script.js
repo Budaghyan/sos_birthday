@@ -296,3 +296,4 @@ function closePopup() {
     popup.classList.remove("fade-out");
     popup.setAttribute("aria-hidden", "true");
   }, 500);
+}
